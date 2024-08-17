@@ -6,81 +6,87 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSplitByAny(t *testing.T) {
+func TestSplitWithWhiteList(t *testing.T) {
 	type TestCase struct {
-		name       string
-		text       string
-		separators []rune
-		expected   []string
+		name      string
+		text      string
+		whitelist []rune
+		expected  []string
 	}
 
 	tests := []TestCase{
 		{
-			name:       "BasicSplit",
-			text:       "Hello World!",
-			separators: []rune{' ', '!'},
-			expected:   []string{"Hello", "World"},
+			name:      "LowercaseLettersWhitelist",
+			text:      "ABCdef!ghi123",
+			whitelist: []rune("abcdefghijklmnopqrstuvwxyz"),
+			expected:  []string{"def", "ghi"},
 		},
 		{
-			name:       "EmptyString",
-			text:       "",
-			separators: []rune{' ', ','},
-			expected:   []string{},
+			name:      "EmptyText",
+			text:      "",
+			whitelist: []rune("abc"),
+			expected:  []string{},
 		},
 		{
-			name:       "NoSeparators",
-			text:       "HelloWorld",
-			separators: []rune{},
-			expected:   []string{"HelloWorld"},
+			name:      "EmptyWhitelist",
+			text:      "Hello World!",
+			whitelist: []rune(""),
+			expected:  []string{},
 		},
 		{
-			name:       "AllSeparators",
-			text:       "!!!",
-			separators: []rune{'!'},
-			expected:   []string{},
+			name:      "OnlyWhitelistCharacters",
+			text:      "abcabc",
+			whitelist: []rune("abc"),
+			expected:  []string{"abcabc"},
 		},
 		{
-			name:       "LeadingSeparators",
-			text:       "!!Hello",
-			separators: []rune{'!'},
-			expected:   []string{"Hello"},
+			name:      "NoWhitelistCharacters",
+			text:      "!!!",
+			whitelist: []rune("abc"),
+			expected:  []string{},
 		},
 		{
-			name:       "TrailingSeparators",
-			text:       "Hello!!",
-			separators: []rune{'!'},
-			expected:   []string{"Hello"},
+			name:      "LeadingNonWhitelistCharacters",
+			text:      "!!!hello",
+			whitelist: []rune("abcdefghijklmnopqrstuvwxyz"),
+			expected:  []string{"hello"},
 		},
 		{
-			name:       "AdjacentSeparators",
-			text:       "Hello,,World",
-			separators: []rune{','},
-			expected:   []string{"Hello", "World"},
+			name:      "TrailingNonWhitelistCharacters",
+			text:      "hello!!!",
+			whitelist: []rune("abcdefghijklmnopqrstuvwxyz"),
+			expected:  []string{"hello"},
 		},
 		{
-			name:       "MixedSeparators",
-			text:       "Hello, World! How are you?",
-			separators: []rune{',', ' ', '!', '?'},
-			expected:   []string{"Hello", "World", "How", "are", "you"},
+			name:      "AdjacentNonWhitelistCharacters",
+			text:      "hello,,world",
+			whitelist: []rune("abcdefghijklmnopqrstuvwxyz"),
+			expected:  []string{"hello", "world"},
 		},
 		{
-			name:       "SingleCharacterElements",
-			text:       "a,b,c",
-			separators: []rune{','},
-			expected:   []string{"a", "b", "c"},
+			name:      "SingleCharacterElements",
+			text:      "a,b,c",
+			whitelist: []rune("abc"),
+			expected:  []string{"a", "b", "c"},
 		},
 		{
-			name:       "UnicodeCharacters",
-			text:       "こんにちは世界",
-			separators: []rune("ん世"),
-			expected:   []string{"こ", "にちは", "界"},
+			name:      "UnicodeCharacters",
+			text:      "こんにちは世界",
+			whitelist: []rune("こにちは世界"),
+			expected:  []string{"こ", "にちは世界"},
+		},
+		{
+			name:      "MixedASCIIAndUnicode",
+			text:      "Hello世界123",
+			whitelist: []rune("elo世界123"),
+			expected:  []string{"ello世界123"},
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			actual := SplitByAny(tc.text, tc.separators)
-			assert.Equal(t, tc.expected, actual, "Failed for case: %s", tc.name)
+			actual := SplitWithWhiteList(tc.text, tc.whitelist)
+			assert.Equal(t, tc.expected, actual)
 		})
 	}
 }
