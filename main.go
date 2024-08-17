@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/SergeyCherepiuk/rfc/internal/load"
+	"github.com/SergeyCherepiuk/rfc/internal/utils"
 )
 
 func main() {
@@ -18,5 +19,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println(string(rfc))
+	allowList := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	words := utils.SplitWithWhiteList(string(rfc), allowList)
+
+	words = utils.FilterRegularWords(words)
+
+	fmt.Printf("%v\nlen: %d\n", words, len(words))
 }
