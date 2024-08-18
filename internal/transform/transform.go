@@ -3,6 +3,7 @@ package transform
 import "github.com/SergeyCherepiuk/rfc/internal/utils"
 
 var DefaultPipeline = []Transformation{
+	utils.Trim("-"),
 	utils.FilterRegularWords,
 	utils.ToLowercaseWords,
 }
@@ -15,7 +16,7 @@ type Transformer struct {
 }
 
 func NewTransformer(text []byte) *Transformer {
-	allowList := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	allowList := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-")
 	words := utils.SplitWithWhiteList(string(text), allowList)
 
 	return &Transformer{
@@ -30,12 +31,9 @@ func (t *Transformer) AddTransformations(transformations ...Transformation) *Tra
 }
 
 func (t *Transformer) Transform() []string {
-	wordsCopy := make([]string, len(t.words))
-	copy(wordsCopy, t.words)
-
 	for _, transformation := range t.transformations {
-		wordsCopy = transformation(wordsCopy)
+		t.words = transformation(t.words)
 	}
 
-	return wordsCopy
+	return t.words
 }
