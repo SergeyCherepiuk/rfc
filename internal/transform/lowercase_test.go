@@ -1,4 +1,4 @@
-package utils
+package transform
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestToLowercaseWords(t *testing.T) {
+func TestLowercaseTransformer(t *testing.T) {
 	type TestCase struct {
 		name     string
 		words    []string
@@ -26,9 +26,11 @@ func TestToLowercaseWords(t *testing.T) {
 		},
 	}
 
+	transformer := NewLowercaseTransformer()
+
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			actual := ToLowercaseWords(test.words)
+			actual := transformer.Transform(test.words)
 			assert.Equal(t, test.expected, actual)
 		})
 	}

@@ -1,6 +1,12 @@
-package utils
+package transform
 
-func FilterRegularWords(words []string) []string {
+type FilterRegularWordsTransformer struct{}
+
+func NewFilterRegularWordsTrasformer() *FilterRegularWordsTransformer {
+	return &FilterRegularWordsTransformer{}
+}
+
+func (t FilterRegularWordsTransformer) Transform(words []string) []string {
 	predicates := []func(string) bool{
 		predicateZeroOrOneLetterWord,
 		predicateUppercaseWord,

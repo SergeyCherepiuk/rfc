@@ -1,4 +1,4 @@
-package utils
+package transform
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFilterRegularWords(t *testing.T) {
+func TestFilterRegularWordsTransformer(t *testing.T) {
 	type TestCase struct {
 		name     string
 		words    []string
@@ -46,9 +46,11 @@ func TestFilterRegularWords(t *testing.T) {
 		},
 	}
 
+	transformer := NewFilterRegularWordsTrasformer()
+
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			actual := FilterRegularWords(test.words)
+			actual := transformer.Transform(test.words)
 			assert.Equal(t, test.expected, actual)
 		})
 	}

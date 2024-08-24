@@ -19,9 +19,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	words := transform.NewTransformer(rfc).
-		AddTransformations(transform.DefaultPipeline...).
-		Transform()
+	words := transform.NewPipeline(rfc).
+		AddTransformations(transform.DefaultTransformers...).
+		Run()
 
 	fmt.Printf("%v\nlen: %d\n", words, len(words))
 }
