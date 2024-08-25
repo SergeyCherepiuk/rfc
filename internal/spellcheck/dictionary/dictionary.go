@@ -30,6 +30,20 @@ func NewDictionary() (Dictionary, error) {
 	return dictionary(words), nil
 }
 
+func (d Dictionary) AllWords() []string {
+	count := 0
+	for _, words := range d.Words {
+		count += len(words)
+	}
+
+	allWords := make([]string, 0, count)
+	for _, words := range d.Words {
+		allWords = append(allWords, words...)
+	}
+
+	return allWords
+}
+
 func (d Dictionary) Contains(word string) bool {
 	if len(word) == 0 {
 		return false

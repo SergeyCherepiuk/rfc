@@ -64,6 +64,33 @@ func TestDictionary(t *testing.T) {
 		})
 	}
 
+	type AllWordsTestCase struct {
+		name     string
+		words    []string
+		expected []string
+	}
+
+	allWordsTestCases := []AllWordsTestCase{
+		{
+			name:     "EmptyDictionary",
+			words:    []string{},
+			expected: []string{},
+		},
+		{
+			name:     "NonEmptyDictionary",
+			words:    []string{"apple", "banana", "cinnamon"},
+			expected: []string{"apple", "banana", "cinnamon"},
+		},
+	}
+
+	for _, tc := range allWordsTestCases {
+		t.Run(tc.name, func(t *testing.T) {
+			dictionary := dictionary(tc.words)
+			actual := dictionary.AllWords()
+			assert.Equal(t, tc.expected, actual)
+		})
+	}
+
 	type ContainsTestCase struct {
 		name     string
 		words    []string

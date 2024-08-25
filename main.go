@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/SergeyCherepiuk/rfc/internal/load"
+	"github.com/SergeyCherepiuk/rfc/internal/spellcheck"
 	"github.com/SergeyCherepiuk/rfc/internal/transform"
 )
 
@@ -23,5 +24,19 @@ func main() {
 		AddTransformations(transform.DefaultTransformers...).
 		Run()
 
-	fmt.Printf("%v\nlen: %d\n", words, len(words))
+	checker, err := spellcheck.NewDictionaryChecker()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, word := range words {
+		correct, suggestion, err := checker.Check(word)
+		if err != nil {
+			log.Fatal()
+		}
+
+		if !correct {
+			fmt.Printf("%s -> %v\n", word, suggestion)
+		}
+	}
 }
