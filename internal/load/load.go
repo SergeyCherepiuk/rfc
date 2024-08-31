@@ -2,6 +2,7 @@ package load
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -56,6 +57,10 @@ func getLatestRfcNumber() (int, error) {
 	return int(latestRfcNumber), nil
 }
 
+func (l RfcLoader) LatestRfcNumber() int {
+	return l.latestRfcNumber
+}
+
 func (l RfcLoader) Load(rfcNumber int) ([]byte, error) {
 	if rfcNumber > l.latestRfcNumber {
 		err := fmt.Errorf("RFC number (%d) is higher than latest available (%d)", rfcNumber, l.latestRfcNumber)
@@ -65,6 +70,11 @@ func (l RfcLoader) Load(rfcNumber int) ([]byte, error) {
 	rfcUrl := fmt.Sprintf("https://www.rfc-editor.org/rfc/rfc%d.txt", rfcNumber)
 
 	rfc, err := getRequestBody(rfcUrl)
+
+	if errors.Is(err, errNotFound) {
+		return make([]byte, 0), nil
+	}
+
 	if err != nil {
 		err = fmt.Errorf("failed to load RFC %d: %w", rfcNumber, err)
 		return nil, err
@@ -73,6 +83,8 @@ func (l RfcLoader) Load(rfcNumber int) ([]byte, error) {
 	return rfc, nil
 }
 
+var errNotFound = errors.New("not found")
+
 func getRequestBody(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {
@@ -80,6 +92,10 @@ func getRequestBody(url string) ([]byte, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, errNotFound
+	}
 
 	if resp.StatusCode != http.StatusOK {
 		body, err := io.ReadAll(resp.Body)
